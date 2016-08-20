@@ -1,9 +1,9 @@
 <?php
 //Create connection credentials
-$db_host = "localhost";
-$db_user = "JackLee";
-$db_pass = "mypassword";
-$db_name = "quizzer"; //created database called quizzer. That's what this is using
+$db_host; //put host name
+$db_user; //put username
+$db_pass; //put password
+$db_name; //created database called quizzer. That's what this is using
 
 //Create mysqli object
 //When dealing with mysqli, using either the procedural method or object orientated method
