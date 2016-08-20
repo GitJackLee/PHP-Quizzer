@@ -37,6 +37,10 @@ input[type="number"] {
   overflow: auto;
 }
 
+.container#maincontainer {
+  margin-top: 3em;
+}
+
 header {
   border-bottom: 3px #f4f4f4 solid;
 }

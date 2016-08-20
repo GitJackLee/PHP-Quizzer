@@ -1,25 +1,74 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>PHP Quizzer</title>
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-  </head>
-  <body>
+<?php include "database.php"; ?>
+<?php
+  if(isset($_POST["submit"])){ //comes from input submit name
+    //Get POST variables
+    $question_number = $mysqli->real_escape_string($_POST["question_number"]); //comes from name="question_number"
+    $question_text = $mysqli->real_escape_string($_POST["question_text"]);
+    $correct_choice = $mysqli->real_escape_string($_POST["correct_choice"]);
 
-    <header>
-      <div class="container">
-          <h1>PHP Quizzer</h1>
-      </div>
-    </header>
+    //Choices array
+    $choices = array();
+    $choices[1] = $_POST["choice1"];
+    $choices[2] = $_POST["choice2"];
+    $choices[3] = $_POST["choice3"];
+    $choices[4] = $_POST["choice4"];
+    $choices[5] = $_POST["choice5"];
+
+    //Question query
+    $query = "INSERT INTO questions (question_number, text) VALUES('$question_number', '$question_text')";
+
+    //Run query
+    $insert_row = $mysqli->query($query) or die($mysqli->error.__LINE__);
+
+    //Validate insert
+    if($insert_row){
+      foreach($choices as $choice => $value){
+        if($value != ''){
+          if($correct_choice == $choice){
+            $is_correct = 1;
+          } else {
+            $is_correct = 0;
+          }
+          //Choice querry
+          $querry = "INSERT INTO choices (question_number, is_correct, text) VALUE ('$question_number', '$is_correct', '$value')";
+
+          //Run querry
+          $insert_row = $mysqli->query($querry) or die($mysqli->error.__LINE__);
+
+          //Validate insert
+          if($insert_row){
+            continue;
+          } else {
+            die("ERROR : (" . $mysqli->errno . ') ' . $mysqli->error);
+          }
+        }
+      }
+      $msg = "Question has been added";
+    }
+  }
+
+  //Get total questions
+  $query = "SELECT * FROM questions";
+  //Get the results
+  $questions = $mysqli->query($query) or die($mysqli->error.__LINE__);
+  $total = $questions->num_rows;
+  $next = $total+1;
+?>
+
+    <?php include "partials/header.php"; ?>
 
     <main>
-      <div class="container">
+      <div class="container" id="maincontainer">
         <h2>Add A Question</h2>
+        <?php
+          if(isset($msg)){
+            echo "<p>".$msg."</p>";
+          }
+        ?>
         <form method="POST" action="add.php">
             <p>
               <label>Question Number</label>
-              <input type="number" name="question_number">
+              <input type="number" value="<?php echo $next?>" name="question_number">
             </p>
             <p>
               <label>Question Text</label>
@@ -56,11 +105,4 @@
       </div>
     </main>
 
-    <footer>
-      <div class="container">
-        Copyright &copy; 2015, PHP Quizzer
-      </div>
-    </footer>
-
-  </body>
-</html>
+    <?php include "partials/footer.php"; ?>

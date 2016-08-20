@@ -1,39 +1,52 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>PHP Quizzer</title>
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-  </head>
-  <body>
+<?php include "database.php"; ?>
+<?php session_start(); ?>
 
-    <header>
-      <div class="container">
-          <h1>PHP Quizzer</h1>
-      </div>
-    </header>
+<?php
+  //Get the number of the question. Use super global called "GET"
+  $number = (int) $_GET['n'];
+
+
+  //Get total
+  $query = "SELECT * FROM questions";
+  //Get result
+  $results = $mysqli->query($query) or die($mysqli->error.__LINE__);
+  $total = $results->num_rows;
+
+  /*
+  * Get Question
+  */
+  $query = "SELECT * FROM questions WHERE question_number = $number";
+
+  //Get result
+  $result = $mysqli->query($query) or die($mysqli->error.__LINE__);
+
+  $question = $result->fetch_assoc();
+
+  /*
+  * Get Choices
+  */
+  $query = "SELECT * FROM choices WHERE question_number = $number";
+
+  //Get results
+  $choices = $mysqli->query($query) or die($mysqli->error.__LINE__);
+?>
+
+    <?php include "partials/header.php"; ?>
 
     <main>
-      <div class="container">
-        <div class="current">Question 1 of 5</div>
-        <p class="question">What does PHP stand for?</p>
+      <div class="container" id="maincontainer">
+        <div class="current">Question <?php echo $question["question_number"]; ?> of <?php echo $total ?></div>
+        <p class="question"><?php echo $question["text"]; ?></p>
         <form method="POST" action="process.php">
           <ul class="choices">
-            <li><input name="choice" type="radio" value="1">PHP: Hypertext Preprocessor</li>
-            <li><input name="choice" type="radio" value="1">Private Home Page</li>
-            <li><input name="choice" type="radio" value="1">Personal Home Page</li>
-            <li><input name="choice" type="radio" value="1">Personal Hypertext Preprocessor</li>
+            <?php while($row = $choices->fetch_assoc()): //while there are still records for the query ?>
+              <li><input name="choice" type="radio" value="<?php echo $row['id']; ?>"><?php echo $row['text']; ?></li>
+            <?php endwhile; ?>
           </ul>
           <input type="submit" value="Submit">
+          <input type="hidden" name="number" value="<?php echo $number; ?>">
         </form>
       </div>
     </main>
 
-    <footer>
-      <div class="container">
-        Copyright &copy; 2015, PHP Quizzer
-      </div>
-    </footer>
-
-  </body>
-</html>
+    <?php include "partials/footer.php"; ?>
